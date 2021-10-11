@@ -22,15 +22,21 @@ class CLAHE:
 
 
     def get_dist_rect(self, x_start, y_start):
-        histogram, bins = np.histogram(self.img[x_start:x_start+self.width_rect,
-                                       y_start:y_start+self.height_rect], 256, [0,256])
+        histogram, bins = np.histogram(self.img[x_start:x_start+self.width,
+                                       y_start:y_start+self.height], 256, [0,256])
 
         norm_histogram = histogram / histogram.sum()
-        plt.bar(bins[:-1], norm_histogram)
+        plt.bar(bins[:-1]/256, norm_histogram)
 
         dist = norm_histogram.cumsum()
 
-        plt.plot(dist)
+        # plt.plot(dist)
+        new_dist = (dist*255).astype(np.int32)
+
+        for i in range(self.height):
+            for j in range(self.width):
+                self.img[i, j] = new_dist[self.img[i,j]]
+
         plt.show()
 
 
