@@ -10,6 +10,8 @@ class CLAHE:
 
         self.nb_rects = 8
 
+        self.lookup_tables_rect = {}
+
     def divide_into_rect(self):
         self.height_rect = self.height // self.nb_rects
         self.width_rect = self.width // self.nb_rects
@@ -21,26 +23,29 @@ class CLAHE:
         self.x_rect_center = self.width_rect // 2
 
 
+
     def get_dist_rect(self, x_start, y_start):
-        histogram, bins = np.histogram(self.img[x_start:x_start+self.width,
-                                       y_start:y_start+self.height], 256, [0,256])
+        histogram, bins = np.histogram(self.img[y_start:y_start+self.height_rect,
+                                       x_start:x_start+self.width_rect], 256, [0, 256])
 
         norm_histogram = histogram / histogram.sum()
-        plt.bar(bins[:-1]/256, norm_histogram)
+        plt.bar(bins[:-1], norm_histogram)
 
         dist = norm_histogram.cumsum()
 
         # plt.plot(dist)
         new_dist = (dist*255).astype(np.int32)
 
-        for i in range(self.height):
-            for j in range(self.width):
-                self.img[i, j] = new_dist[self.img[i,j]]
+        self.lookup_tables_rect[(y_start+self.y_rect_center, x_start+self.x_rect_center)] = new_dist[self.img[y_start+self.y_rect_center, x_start+self.x_rect_center]]
 
-        plt.show()
+        # plt.show()
 
 
-
+    def walking_by_central_point(self):
+        for x_start in range(0, self.width, self.width_rect):
+            for y_start in range(0, self.height, self.height_rect):
+                if x_start+self.x_rect_center < self.width and y_start+self.y_rect_center < self.height:
+                    self.get_dist_rect(x_start, y_start)
 
 
     def show(self):
