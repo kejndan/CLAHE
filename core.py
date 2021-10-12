@@ -11,6 +11,7 @@ class CLAHE:
         self.nb_rects = 8
 
         self.lookup_tables_rect = {}
+        self.numpy_control_points = []
 
     def divide_into_rect(self):
         self.height_rect = self.height // self.nb_rects
@@ -38,6 +39,7 @@ class CLAHE:
 
         self.lookup_tables_rect[(y_start+self.y_rect_center, x_start+self.x_rect_center)] = new_dist[self.img[y_start+self.y_rect_center, x_start+self.x_rect_center]]
 
+        self.numpy_control_points.append([y_start+self.y_rect_center, x_start+self.x_rect_center])
         # plt.show()
 
 
@@ -46,6 +48,21 @@ class CLAHE:
             for y_start in range(0, self.height, self.height_rect):
                 if x_start+self.x_rect_center < self.width and y_start+self.y_rect_center < self.height:
                     self.get_dist_rect(x_start, y_start)
+        self.numpy_control_points = np.asarray(self.numpy_control_points)
+
+
+    def get_nearest_control_points(self, point, nb_nearest_points, type_dist='abs'):
+        control_points = np.abs(self.numpy_control_points - np.asarray(point)).sum(axis=1)
+
+        control_points = np.argsort(control_points)[:nb_nearest_points]
+
+
+
+
+
+
+
+
 
 
     def show(self):
