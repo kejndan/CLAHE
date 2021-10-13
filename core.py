@@ -41,7 +41,7 @@ class CLAHE:
 
 
 
-        self.lookup_tables_rect[(y_start+self.y_rect_center, x_start+self.x_rect_center)] = dist
+        self.lookup_tables_rect[(y_start+self.y_rect_center, x_start+self.x_rect_center)] = new_dist
 
         self.numpy_control_points.append([y_start+self.y_rect_center, x_start+self.x_rect_center])
         # plt.show()
@@ -123,9 +123,37 @@ class CLAHE:
                 for y in range(top_left[0], bottom_right[0]):
                     for x in range(top_left[1], bottom_right[1]):
                         if zone == 'blue':
-                            top_right =
+                            top_right = np.array([top_left[0], bottom_right[1]])
+                            bottom_left = np.array([bottom_right[0], top_left[1]])
+
+                            x_ratio = np.array([(top_right[1]-x)/(top_right[1]-top_left[1]),
+                                                (x-top_left[1])/(top_right[1]-top_left[1])])
+                            y_ratio = np.array([(bottom_left[0]-y)/(bottom_left[0]-top_left[0]),
+                                                (y-top_left[0])/(bottom_left[0]-top_left[0])])
+
+                            r1 = x_ratio[0]*self.lookup_tables_rect[tuple(top_left)] + x_ratio[1]*self.lookup_tables_rect[tuple(top_right)]
+                            r2 = x_ratio[0] * self.lookup_tables_rect[tuple(bottom_left)] + x_ratio[1] * \
+                                 self.lookup_tables_rect[tuple(bottom_right)]
+
+                            z = y_ratio[0]*r1 + y_ratio[1]*r2
+
+                            self.img[y,x] = np.uint8(z[self.img[y,x]])
+
                         elif zone == 'green':
                             self.img[y,x] = 127
+
+                            x_ratio = np.array([(bottom_right[1]-x)/(bottom_right[1]-top_left[1]),
+                                                (x-top_left[1])/(bottom_right[1]-top_left[1])])
+
+                            if i == -1 or j == 7:
+                                first_point = self.center_points[j,i].astype(int)
+                            elif j == -1 or i == 7:
+                                first_point = self.center_points[j,i].astype(int)
+
+
+                            z = x_ratio[0]*self.lookup_tables_rect[tuple(bottom_left)]
+
+
                         elif zone == 'red':
                             self.img[y,x] = 255
 
