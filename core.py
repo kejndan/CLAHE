@@ -80,45 +80,103 @@ class CLAHE:
 
         for i in range(-1,8):
             for j in range(-1,8):
-                border = 0
-                if i == -1 and j == -1:
-                    top_left = np.array([0, 0])
-                    border = 2
-                elif i == -1:
-                    top_left = np.array([self.center_points[j-1,0][0], 0]).astype(int)
-                    border += 1
-                elif j == -1:
-                    top_left = np.array([0,self.center_points[0, i-1][1]]).astype(int)
+                # border = 0
+                # if i == -1 and j == -1:
+                #     top_left = np.array([0, 0])
+                #     border = 2
+                # elif i == -1:
+                #     top_left = np.array([self.center_points[j,0][0], 0]).astype(int)
+                #     border += 1
+                # elif j == -1:
+                #     top_left = np.array([0,self.center_points[0, i][1]]).astype(int)
+                #
+                #     border += 1
+                # else:
+                #     top_left = self.center_points[j,i].astype(int)
+                #
+                #     border += 0
+                #
+                # if i == 7 and j == 7:
+                #     bottom_right = np.array([self.height-1, self.width-1]).astype(int)
+                #
+                #     border = 2
+                # elif i == 7:
+                #     bottom_right = np.array([,self.width-1]).astype(int)
+                #
+                #     border += 1
+                # elif j == 7:
+                #     bottom_right = np.array([self.height-1,self.center_points[j, i+1][1]]).astype(int)
+                #
+                #     border += 1
+                # else:
+                #     bottom_right = self.center_points[j+1,i+1].astype(int)
+                #
+                #     border += 0
 
-                    border += 1
-                else:
-                    top_left = self.center_points[j,i].astype(int)
-
-                    border += 0
-
-                if i == 7 and j == 7:
-                    bottom_right = np.array([self.height, self.width]).astype(int)
-
-                    border = 2
-                elif i == 7:
-                    bottom_right = np.array([self.center_points[j+1,i][0],self.width]).astype(int)
-
-                    border += 1
-                elif j == 7:
-                    bottom_right = np.array([self.height,self.center_points[j, i+1][1]]).astype(int)
-
-                    border += 1
-                else:
+                if i != -1 and i != 7 and j != -1 and j != 7:
+                    top_left = self.center_points[j, i].astype(int)
+                    bottom_right = self.center_points[j + 1, i + 1].astype(int)
+                    zone = 'blue'
+                elif i == -1 and j != 7 and j != -1:
+                    top_left = np.array([self.center_points[j,0][0], 0]).astype(int)
                     bottom_right = self.center_points[j+1,i+1].astype(int)
 
-                    border += 0
-
-                if border == 2:
-                    zone = 'red'
-                elif border == 1:
+                    first_point = self.center_points[j, 0].astype(int)
+                    second_point = self.center_points[j+1, 0].astype(int)
                     zone = 'green'
-                else:
-                    zone = 'blue'
+                elif j == -1 and i != -1 and i != 7:
+                    top_left = np.array([0, self.center_points[0, i][1]]).astype(int)
+                    bottom_right = self.center_points[j + 1, i + 1].astype(int)
+
+                    first_point = self.center_points[0, i].astype(int)
+                    second_point = self.center_points[0, i+1].astype(int)
+                    zone = 'green'
+                elif i == 7 and j != -1 and j != 7:
+                    top_left = self.center_points[j, i].astype(int)
+                    bottom_right = np.array([self.center_points[j+1, i][0], self.width - 1]).astype(int)
+
+                    first_point = self.center_points[j, 7].astype(int)
+                    second_point = self.center_points[j + 1, 7].astype(int)
+                    zone = 'green'
+                elif j == 7 and i != -1 and i != 7:
+                    top_left = self.center_points[j, i].astype(int)
+                    bottom_right = np.array([self.height - 1, self.center_points[j, i + 1][1]]).astype(int)
+
+                    first_point = self.center_points[7, i].astype(int)
+                    second_point = self.center_points[7, i + 1].astype(int)
+                    zone = 'green'
+                elif i == -1 and j == -1:
+                    top_left = np.array([0, 0])
+                    bottom_right = self.center_points[j + 1, i + 1].astype(int)
+
+
+                    dot_point = self.center_points[0,0].astype(int)
+                    zone = 'red'
+                elif i == -1 and j == 7:
+                    top_left = np.array([self.center_points[j, 0][0], 0]).astype(int)
+                    bottom_right = np.array([self.height - 1, self.center_points[j, i + 1][1]]).astype(int)
+
+                    dot_point = self.center_points[7, 0].astype(int)
+                    zone = 'red'
+                elif i == 7 and j == -1:
+                    top_left = np.array([0, self.center_points[0, i][1]]).astype(int)
+                    bottom_right = np.array([self.center_points[j+1, i][0], self.width - 1]).astype(int)
+
+                    dot_point = self.center_points[0, 7].astype(int)
+                    zone = 'red'
+                elif i == 7 and j == 7:
+                    top_left = self.center_points[j, i].astype(int)
+                    bottom_right = np.array([self.height - 1, self.width - 1]).astype(int)
+                    dot_point = self.center_points[7, 7].astype(int)
+                    zone = 'red'
+
+                #
+                # if border == 2:
+                #     zone = 'red'
+                # elif border == 1:
+                #     zone = 'green'
+                # else:
+                #     zone = 'blue'
 
                 for y in range(top_left[0], bottom_right[0]):
                     for x in range(top_left[1], bottom_right[1]):
@@ -138,24 +196,25 @@ class CLAHE:
                             z = y_ratio[0]*r1 + y_ratio[1]*r2
 
                             self.img[y,x] = np.uint8(z[self.img[y,x]])
+                            # self.img[y,x] = 0
 
                         elif zone == 'green':
-                            self.img[y,x] = 127
 
-                            x_ratio = np.array([(bottom_right[1]-x)/(bottom_right[1]-top_left[1]),
-                                                (x-top_left[1])/(bottom_right[1]-top_left[1])])
+                            if i == -1 or i == 7:
 
-                            if i == -1 or j == 7:
-                                first_point = self.center_points[j,i].astype(int)
-                            elif j == -1 or i == 7:
-                                first_point = self.center_points[j,i].astype(int)
+                                ratio = np.array([(second_point[0] - y) / (second_point[0] - first_point[0]),
+                                                  (y - first_point[0]) / (second_point[0] - first_point[0])])
+                            elif j == -1 or j == 7:
+                                ratio = np.array([(second_point[1] - x) / (second_point[1] - first_point[1]),
+                                                  (x - first_point[1]) / (second_point[1] - first_point[1])])
 
 
-                            z = x_ratio[0]*self.lookup_tables_rect[tuple(bottom_left)]
-
+                            z = ratio[0]*self.lookup_tables_rect[tuple(first_point)]+ratio[1]*self.lookup_tables_rect[tuple(second_point)]
+                            self.img[y, x] = np.uint8(z[self.img[y, x]])
+                            # self.img[y, x] = 127
 
                         elif zone == 'red':
-                            self.img[y,x] = 255
+                            self.img[y,x] = np.uint8(self.lookup_tables_rect[tuple(dot_point)][self.img[y,x]])
 
 
 
