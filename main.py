@@ -1,8 +1,10 @@
 from core import CLAHE
-
+import time
 
 if __name__ == '__main__':
-    alg = CLAHE('xinwei1.jpg')
+    alg = CLAHE('indi.png')
+    alg.show()
     alg.divide_into_rect()
-    alg.get_dist_rect(0,0)
-    # alg.show()
+    alg.walking_by_central_point()
+    alg.fill_each_point()
+    alg.show()
