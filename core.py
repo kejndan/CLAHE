@@ -18,6 +18,8 @@ class CLAHE:
 
         self.center_points = np.zeros((self.nb_rects, self.nb_rects, 2))
 
+        self.cliping_limit = 125
+
     def divide_into_rect(self):
         self.height_rect = self.height // self.nb_rects
         self.width_rect = self.width // self.nb_rects
@@ -27,6 +29,7 @@ class CLAHE:
     def get_dist_rect(self, x_start, y_start):
         histogram, bins = np.histogram(self.img[y_start:y_start+self.height_rect,
                                        x_start:x_start+self.width_rect], 256, [0, 256])
+        histogram = self.cliping(histogram)
         norm_histogram = histogram / histogram.sum()
         plt.bar(bins[:-1], norm_histogram)
         dist = norm_histogram.cumsum()
@@ -154,6 +157,21 @@ class CLAHE:
                         elif zone == 'red':
                             dot_point = info[3]
                             self.img[y,x] = np.uint8(self.lookup_tables_rect[tuple(dot_point)][self.img[y,x]])
+
+
+    def cliping(self, histogram):
+        r = len(histogram)
+        top = self.cliping_limit
+        bottom = 0
+        while (top - bottom) > 1:
+            middle = (top+bottom)/2
+            s = histogram[np.where(histogram > self.cliping_limit)[0]].sum()
+            if s > (self.cliping_limit - middle)*r:
+                top = middle
+            else:
+                bottom = middle
+        histogram = np.where(histogram < bottom, histogram + self.cliping_limit - bottom, self.cliping_limit)
+        return histogram
 
 
     def show(self):
