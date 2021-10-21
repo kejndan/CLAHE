@@ -21,15 +21,22 @@ class CLAHE:
         self.cliping_limit = 125
 
     def divide_into_rect(self):
+        """
+        Calc size of rectangle for divide into rectangle image
+        :return:
+        """
         self.height_rect = self.height // self.nb_rects
         self.width_rect = self.width // self.nb_rects
         self.y_rect_center = self.height_rect // 2
         self.x_rect_center = self.width_rect // 2
 
     def get_dist_rect(self, x_start, y_start):
+        """
+        Histogram equalization
+        """
         histogram, bins = np.histogram(self.img[y_start:y_start+self.height_rect,
                                        x_start:x_start+self.width_rect], 256, [0, 256])
-        histogram = self.cliping(histogram)
+        histogram = self.clipping(histogram)
         norm_histogram = histogram / histogram.sum()
         plt.bar(bins[:-1], norm_histogram)
         dist = norm_histogram.cumsum()
@@ -38,6 +45,9 @@ class CLAHE:
         self.numpy_control_points.append([y_start+self.y_rect_center, x_start+self.x_rect_center])
 
     def walking_by_central_point(self):
+        """
+        Image traversal by control points
+        """
         for i, x_start in enumerate(range(0, self.width, self.width_rect)):
             for j, y_start in enumerate(range(0, self.height, self.height_rect)):
                 if x_start+self.x_rect_center < self.width and y_start+self.y_rect_center < self.height:
@@ -47,7 +57,9 @@ class CLAHE:
         self.numpy_control_points = np.asarray(self.numpy_control_points)
 
     def get_zone_n_points(self, i, j):
-
+        """
+        Determining the zone based on the location of the control point
+        """
         if i != -1 and i != 7 and j != -1 and j != 7:
             top_left = self.center_points[j, i].astype(int)
             bottom_right = self.center_points[j + 1, i + 1].astype(int)
@@ -158,8 +170,8 @@ class CLAHE:
                             dot_point = info[3]
                             self.img[y,x] = np.uint8(self.lookup_tables_rect[tuple(dot_point)][self.img[y,x]])
 
+    def clipping(self, histogram):
 
-    def cliping(self, histogram):
         r = len(histogram)
         top = self.cliping_limit
         bottom = 0
@@ -173,9 +185,20 @@ class CLAHE:
         histogram = np.where(histogram < bottom, histogram + self.cliping_limit - bottom, self.cliping_limit)
         return histogram
 
-
     def show(self):
         plt.imshow(self.img, cmap='gray')
         plt.axis('off')
         plt.show()
+
+    def run(self):
+        self.show()
+        self.divide_into_rect()
+        self.walking_by_central_point()
+        self.fill_each_point()
+        self.show()
+
+    def save(self, path):
+        plt.imshow(self.img, cmap='gray')
+        plt.axis('off')
+        plt.savefig(path)
 
