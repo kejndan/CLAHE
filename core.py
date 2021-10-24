@@ -40,7 +40,7 @@ class CLAHE:
         norm_histogram = histogram / histogram.sum()
         plt.bar(bins[:-1], norm_histogram)
         dist = norm_histogram.cumsum()
-        new_dist = (dist*255).astype(np.int32)
+        new_dist = np.round(dist*255, 0).astype(np.int32)
         self.lookup_tables_rect[(y_start+self.y_rect_center, x_start+self.x_rect_center)] = new_dist
         self.numpy_control_points.append([y_start+self.y_rect_center, x_start+self.x_rect_center])
 
